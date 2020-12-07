@@ -1,0 +1,76 @@
+---
+title: "Election Data"
+author: "Abby Zimmardi"
+date: "12/2/2020"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse)
+#install.packages("rio") 
+library(dplyr)
+#install.packages("reshape")
+#library(reshape)
+```
+
+```{r}
+election <- rio::import('/Users/abbyzimmardi/Downloads/Data Fall 2020/Election/2020 Election Data by County.xlsx')
+```
+
+```{r}
+#master <- rio::import('https://raw.githubusercontent.com/profrobwells/CovidFall2020/master/master_file.csv')
+master <- rio::import('https://raw.githubusercontent.com/Arkansascovid/Main/master/master_file.csv')
+```
+
+
+#Cut rows from df 
+```{r}
+election <- slice(election, -c(1))
+head(election)
+```
+#Renaming Columns
+```{r}
+election2 <-election %>%
+  rename(county_name = ...1, precinctsreported = ...2, biden_pct_vote = ...4, trump_pct_vote = ...6)
+head(election2)
+```
+
+
+#Renaming county names
+```{r}
+election2$county_nam <- election2$county_nam
+election2$county_nam <- gsub("Arkansas", "Arkansas_all_counties", election2$county_nam)
+election2$county_nam <- gsub("St. Francis", "St.Francis", election2$county_nam)
+election2$county_nam <- gsub("Hot Spring", "HotSpring", election2$county_nam)
+election2$county_nam <- gsub("Little River", "LittleRiver", election2$county_nam)
+election2$county_nam <- gsub(" ", "", election2$county_nam)
+election2
+
+
+```
+#Renaming the second "Arkansas" to "Arkansas_county
+```{r}
+election2[2, 7] <- "Arkansas_county"
+election2
+
+#election2[1, 7] <- "Arkansas_all_counties"
+#election2
+
+```
+
+```{r}
+election_master <- election2 %>% 
+  inner_join(master, by=c("county_nam"))
+election_master
+
+```
+```{r}
+write.csv(election_master, "election_master.csv")
+```
+
+
+
+
+
+
